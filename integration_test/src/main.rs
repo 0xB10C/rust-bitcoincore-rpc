@@ -31,6 +31,9 @@ use bitcoin::{
     TxIn, TxOut, Txid,
 };
 use bitcoincore_rpc::bitcoincore_rpc_json::ScanTxOutRequest;
+use bitcoincore_rpc::bitcoincore_rpc_json::{
+    GetBlockTemplateOptionsModes, GetBlockTemplateOptionsRules,
+};
 
 lazy_static! {
     static ref SECP: secp256k1::Secp256k1<secp256k1::All> = secp256k1::Secp256k1::new();
@@ -187,6 +190,7 @@ fn main() {
     test_get_net_totals(&cl);
     test_get_network_hash_ps(&cl);
     test_uptime(&cl);
+    test_getblocktemplate(&cl);
     //TODO import_multi(
     //TODO verify_message(
     //TODO wait_for_new_block(&self, timeout: u64) -> Result<json::BlockRef> {
@@ -1022,6 +1026,24 @@ fn test_scantxoutset(cl: &Client) {
 
     assert_eq!(utxos.unspents.len(), 2);
     assert_eq!(utxos.success, Some(true));
+}
+
+fn test_getblocktemplate(cl: &Client) {
+    // We want to have a transaction in the mempool so the GetBlockTemplateResult
+    // contains an entry in the vector of GetBlockTemplateResultTransaction.
+    // Otherwise the GetBlockTemplateResultTransaction deserialization wouldn't
+    // be tested.
+    cl.send_to_address(&RANDOM_ADDRESS, btc(1), None, None, None, None, None, None).unwrap();
+
+    cl.get_block_template(
+        GetBlockTemplateOptionsModes::Template,
+        vec![GetBlockTemplateOptionsRules::SegWit],
+        vec![],
+    )
+    .unwrap();
+
+    // cleanup mempool transaction
+    cl.generate_to_address(2, &RANDOM_ADDRESS).unwrap();
 }
 
 fn test_stop(cl: Client) {
