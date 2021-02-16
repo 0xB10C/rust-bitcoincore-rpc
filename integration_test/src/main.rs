@@ -1006,7 +1006,7 @@ fn test_get_chain_tips(cl: &Client) {
     let hash = tips.last().unwrap().hash;
     cl.invalidate_block(&hash).unwrap();
 
-    cl.generate(2, None).unwrap();
+    cl.generate_to_address(2, RANDOM_ADDRESS);
     cl.reconsider_block(&hash).unwrap();
 
     let tips = cl.get_chain_tips().unwrap();
