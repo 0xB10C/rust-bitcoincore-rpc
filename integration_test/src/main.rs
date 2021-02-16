@@ -1002,6 +1002,17 @@ fn test_get_tx_out_set_info(cl: &Client) {
 fn test_get_chain_tips(cl: &Client) {
     let tips = cl.get_chain_tips().unwrap();
     assert_eq!(tips.len(), 1);
+
+    let hash = tips.last().unwrap().hash;
+    cl.invalidate_block(&hash).unwrap();
+
+    cl.generate(2, None).unwrap();
+    cl.reconsider_block(&hash).unwrap();
+
+    let tips = cl.get_chain_tips().unwrap();
+    println!("tips: {:?}", tips);
+
+    assert!(false);
 }
 
 fn test_get_net_totals(cl: &Client) {
