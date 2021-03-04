@@ -201,6 +201,18 @@ pub struct GetBlockResult {
 }
 
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+pub struct GetBlockTxFeesResult {
+    pub tx: Vec<GetBlockTxFeesResultTxidFee>,
+}
+
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+pub struct GetBlockTxFeesResultTxidFee {
+    pub txid: bitcoin::Txid,
+    #[serde(with = "bitcoin::util::amount::serde::as_btc", default)]
+    pub fee: Amount,
+}
+
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlockHeaderResult {
     pub hash: bitcoin::BlockHash,
