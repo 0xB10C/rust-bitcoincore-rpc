@@ -346,6 +346,10 @@ pub trait RpcApi: Sized {
     }
     //TODO(stevenroose) add getblock_txs
 
+    fn get_block_txid_fee(&self, hash: &bitcoin::BlockHash) -> Result<json::GetBlockTxFeesResult> {
+        self.call("getblock", &[into_json(hash)?, 2.into()])
+    }
+
     fn get_block_header(&self, hash: &bitcoin::BlockHash) -> Result<bitcoin::block::Header> {
         let hex: String = self.call("getblockheader", &[into_json(hash)?, false.into()])?;
         Ok(encode::deserialize_hex(&hex)?)
