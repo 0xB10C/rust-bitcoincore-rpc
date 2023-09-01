@@ -342,10 +342,28 @@ pub trait RpcApi: Sized {
         self.call("getblock", &[into_json(hash)?, 0.into()])
     }
 
+    /// getblock with verbosity level 1
+    /// Includes information about the block and the txids of the included transactions
     fn get_block_info(&self, hash: &bitcoin::BlockHash) -> Result<json::GetBlockResult> {
         self.call("getblock", &[into_json(hash)?, 1.into()])
     }
-    //TODO(stevenroose) add getblock_txs
+
+    /// getblock with verbosity level 2
+    /// Includes information about the block and transactions including transaction fees
+    /// (if undo data is available)
+    fn get_block_txs(&self, hash: &bitcoin::BlockHash) -> Result<json::GetBlockVerboseResult> {
+        self.call("getblock", &[into_json(hash)?, 2.into()])
+    }
+
+    /// getblock with verbosity level 3
+    /// Includes information about the block and transactions including transaction fees and
+    /// information about the previous outputs being spent (if undo data is available)
+    fn get_block_txs_with_prevout(
+        &self,
+        hash: &bitcoin::BlockHash,
+    ) -> Result<json::GetBlockVerboseResult> {
+        self.call("getblock", &[into_json(hash)?, 3.into()])
+    }
 
     fn get_block_header(&self, hash: &bitcoin::BlockHash) -> Result<bitcoin::block::Header> {
         let hex: String = self.call("getblockheader", &[into_json(hash)?, false.into()])?;

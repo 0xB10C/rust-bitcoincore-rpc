@@ -221,6 +221,89 @@ pub struct GetBlockResult {
 
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct GetBlockVerboseResult {
+    pub hash: bitcoin::BlockHash,
+    pub confirmations: i32,
+    pub size: usize,
+    pub strippedsize: Option<usize>,
+    pub weight: usize,
+    pub height: usize,
+    pub version: i32,
+    #[serde(default, with = "crate::serde_hex::opt")]
+    pub version_hex: Option<Vec<u8>>,
+    pub merkleroot: bitcoin::hash_types::TxMerkleNode,
+    pub tx: Vec<GetBlockVerboseResultTransaction>,
+    pub time: usize,
+    pub mediantime: Option<usize>,
+    pub nonce: u32,
+    pub bits: String,
+    pub difficulty: f64,
+    #[serde(with = "crate::serde_hex")]
+    pub chainwork: Vec<u8>,
+    pub n_tx: usize,
+    pub previousblockhash: Option<bitcoin::BlockHash>,
+    pub nextblockhash: Option<bitcoin::BlockHash>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBlockVerboseResultTransaction {
+    #[serde(rename = "in_active_chain")]
+    pub in_active_chain: Option<bool>,
+    #[serde(with = "crate::serde_hex")]
+    pub hex: Vec<u8>,
+    pub txid: bitcoin::Txid,
+    pub hash: bitcoin::Wtxid,
+    pub size: usize,
+    pub vsize: usize,
+    pub version: u32,
+    pub locktime: u32,
+    pub vin: Vec<GetBlockVerboseResultVin>,
+    pub vout: Vec<GetRawTransactionResultVout>,
+    pub blockhash: Option<bitcoin::BlockHash>,
+    pub confirmations: Option<u32>,
+    pub time: Option<usize>,
+    pub blocktime: Option<usize>,
+    #[serde(default, with = "bitcoin::amount::serde::as_btc::opt")]
+    pub fee: Option<Amount>, // not included in coinbase transactions
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBlockVerboseResultVin {
+    pub sequence: u32,
+    /// The raw scriptSig in case of a coinbase tx.
+    #[serde(default, with = "crate::serde_hex::opt")]
+    pub coinbase: Option<Vec<u8>>,
+    /// Not provided for coinbase txs.
+    pub txid: Option<bitcoin::Txid>,
+    /// Not provided for coinbase txs.
+    pub vout: Option<u32>,
+    /// The scriptSig in case of a non-coinbase tx.
+    pub script_sig: Option<GetRawTransactionResultVinScriptSig>,
+    /// Not provided for coinbase txs.
+    #[serde(default, deserialize_with = "deserialize_hex_array_opt")]
+    pub txinwitness: Option<Vec<Vec<u8>>>,
+    /// The previous output spent by this input. Only provided with verbosity
+    /// level 3. Otherwise [None].
+    #[serde(default, rename = "prevout")]
+    pub prev_out: Option<GetBlockVerboseResultPrevout>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBlockVerboseResultPrevout {
+    /// If this previous output is a coinbase.
+    pub generated: bool,
+    /// The height where this previous output was created.
+    pub height: usize,
+    #[serde(with = "bitcoin::amount::serde::as_btc")]
+    pub value: Amount,
+    pub script_pubkey: GetRawTransactionResultVoutScriptPubKey,
+}
+
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GetBlockHeaderResult {
     pub hash: bitcoin::BlockHash,
     pub confirmations: i32,
