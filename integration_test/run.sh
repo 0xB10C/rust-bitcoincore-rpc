@@ -22,9 +22,12 @@ BLOCKFILTERARG=""
 if bitcoind -version | grep -q "v0\.\(19\|2\)"; then
     BLOCKFILTERARG="-blockfilterindex=1"
 fi
+if bitcoind -version | grep -q "v2"; then
+    BLOCKFILTERARG="-blockfilterindex=basic"
+fi
 
 FALLBACKFEEARG=""
-if bitcoind -version | grep -q "v0\.2"; then
+if bitcoind -version | grep -q "v0\.2\|v2"; then
     FALLBACKFEEARG="-fallbackfee=0.00001000"
 fi
 
