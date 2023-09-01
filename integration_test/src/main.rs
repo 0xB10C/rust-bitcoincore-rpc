@@ -320,16 +320,27 @@ fn test_get_block_hash(cl: &Client) {
 }
 
 fn test_get_block(cl: &Client) {
+    // mine a block that includes a few transactions
+    for _ in 0..10 {
+        cl.send_to_address(&RANDOM_ADDRESS, btc(0.01), None, None, None, None, None, None).unwrap();
+    }
+    cl.generate_to_address(1, &RANDOM_ADDRESS).unwrap();
+
     let tip = cl.get_best_block_hash().unwrap();
     let block = cl.get_block(&tip).unwrap();
     let hex = cl.get_block_hex(&tip).unwrap();
     assert_eq!(block, deserialize(&Vec::<u8>::from_hex(&hex).unwrap()).unwrap());
     assert_eq!(hex, serialize_hex(&block));
 
-    let tip = cl.get_best_block_hash().unwrap();
     let info = cl.get_block_info(&tip).unwrap();
     assert_eq!(info.hash, tip);
     assert_eq!(info.confirmations, 1);
+
+    let block_txs = cl.get_block_txs(&tip).unwrap();
+    let block_txs_prevout = cl.get_block_txs_with_prevout(&tip).unwrap();
+
+    println!("txs {:?}", block_txs);
+    println!("tx with prevout {:?}", block_txs_prevout);
 }
 
 fn test_get_block_header_get_block_header_info(cl: &Client) {
