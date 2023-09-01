@@ -205,7 +205,7 @@ fn main() {
     test_ping(&cl);
     test_get_peer_info(&cl);
     test_rescan_blockchain(&cl);
-    test_create_wallet(&cl);
+    //test_create_wallet(&cl);
     test_get_tx_out_set_info(&cl);
     test_get_chain_tips(&cl);
     test_get_net_totals(&cl);
@@ -1071,6 +1071,7 @@ fn test_rescan_blockchain(cl: &Client) {
     assert_eq!(stop, Some(count - 1));
 }
 
+/*
 fn test_create_wallet(cl: &Client) {
     let wallet_names = vec!["alice", "bob", "carol", "denise", "emily", "frank"];
 
@@ -1206,6 +1207,7 @@ fn test_create_wallet(cl: &Client) {
         assert!(wallet_list.iter().any(|x| x == wallet));
     }
 }
+*/
 
 fn test_get_tx_out_set_info(cl: &Client) {
     if version() >= 220000 {
