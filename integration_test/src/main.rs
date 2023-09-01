@@ -140,7 +140,13 @@ fn main() {
     unsafe { VERSION = cl.version().unwrap() };
     println!("Version: {}", version());
 
-    cl.create_wallet("testwallet", None, None, None, None).unwrap();
+    if version() >= 230000 {
+        // This is explicilty not a descriptor wallet. The tests try to export
+        // private keys, which isn't possible with descriptor wallets.
+        cl.create_wallet("testwallet", None, None, None, None, Some(false), None).unwrap();
+    } else {
+        cl.create_wallet("testwallet", None, None, None, None, None, None).unwrap();
+    }
 
     test_get_mining_info(&cl);
     test_get_blockchain_info(&cl);
@@ -1066,7 +1072,7 @@ fn test_rescan_blockchain(cl: &Client) {
 }
 
 fn test_create_wallet(cl: &Client) {
-    let wallet_names = vec!["alice", "bob", "carol", "denise", "emily"];
+    let wallet_names = vec!["alice", "bob", "carol", "denise", "emily", "frank"];
 
     struct WalletParams<'a> {
         name: &'a str,
@@ -1074,6 +1080,8 @@ fn test_create_wallet(cl: &Client) {
         blank: Option<bool>,
         passphrase: Option<&'a str>,
         avoid_reuse: Option<bool>,
+        descriptors: Option<bool>,
+        load_on_startup: Option<bool>,
     }
 
     let mut wallet_params = vec![
@@ -1083,6 +1091,8 @@ fn test_create_wallet(cl: &Client) {
             blank: None,
             passphrase: None,
             avoid_reuse: None,
+            descriptors: None,
+            load_on_startup: None,
         },
         WalletParams {
             name: wallet_names[1],
@@ -1090,6 +1100,8 @@ fn test_create_wallet(cl: &Client) {
             blank: None,
             passphrase: None,
             avoid_reuse: None,
+            descriptors: None,
+            load_on_startup: None,
         },
         WalletParams {
             name: wallet_names[2],
@@ -1097,6 +1109,8 @@ fn test_create_wallet(cl: &Client) {
             blank: Some(true),
             passphrase: None,
             avoid_reuse: None,
+            descriptors: None,
+            load_on_startup: None,
         },
     ];
 
@@ -1107,6 +1121,8 @@ fn test_create_wallet(cl: &Client) {
             blank: None,
             passphrase: Some("pass"),
             avoid_reuse: None,
+            descriptors: None,
+            load_on_startup: None,
         });
         wallet_params.push(WalletParams {
             name: wallet_names[4],
@@ -1114,6 +1130,20 @@ fn test_create_wallet(cl: &Client) {
             blank: None,
             passphrase: None,
             avoid_reuse: Some(true),
+            descriptors: None,
+            load_on_startup: None,
+        });
+    }
+
+    if version() >= 220000 {
+        wallet_params.push(WalletParams {
+            name: wallet_names[5],
+            disable_private_keys: None,
+            blank: None,
+            passphrase: None,
+            avoid_reuse: Some(true),
+            descriptors: Some(false),
+            load_on_startup: Some(true),
         });
     }
 
@@ -1125,6 +1155,8 @@ fn test_create_wallet(cl: &Client) {
                 wallet_param.blank,
                 wallet_param.passphrase,
                 wallet_param.avoid_reuse,
+                wallet_param.descriptors,
+                wallet_param.load_on_startup,
             )
             .unwrap();
 
@@ -1144,8 +1176,10 @@ fn test_create_wallet(cl: &Client) {
 
         let has_private_keys = !wallet_param.disable_private_keys.unwrap_or(false);
         assert_eq!(wallet_info.private_keys_enabled, has_private_keys);
-        let has_hd_seed = has_private_keys && !wallet_param.blank.unwrap_or(false);
+
+        let has_hd_seed = has_private_keys && !wallet_param.blank.unwrap_or(if version() >= 230000 { true } else { false });
         assert_eq!(wallet_info.hd_seed_id.is_some(), has_hd_seed);
+
         let has_avoid_reuse = wallet_param.avoid_reuse.unwrap_or(false);
         assert_eq!(wallet_info.avoid_reuse.unwrap_or(false), has_avoid_reuse);
         assert_eq!(
@@ -1282,11 +1316,9 @@ fn test_getblocktemplate(cl: &Client) {
 }
 
 fn test_unloadwallet(cl: &Client) {
-    cl.create_wallet("testunloadwallet", None, None, None, None).unwrap();
+    cl.create_wallet("testunloadwallet", None, None, None, None, None, None).unwrap();
 
-    let res = new_wallet_client("testunloadwallet")
-        .unload_wallet(None)
-        .unwrap();
+    let res = new_wallet_client("testunloadwallet").unload_wallet(None).unwrap();
 
     if version() >= 210000 {
         assert!(res.is_some());
@@ -1300,7 +1332,7 @@ fn test_loadwallet(_: &Client) {
     let wallet_client = new_wallet_client(wallet_name);
 
     assert!(wallet_client.load_wallet(wallet_name).is_err());
-    wallet_client.create_wallet(wallet_name, None, None, None, None).unwrap();
+    wallet_client.create_wallet(wallet_name, None, None, None, None, None, None).unwrap();
     assert!(wallet_client.load_wallet(wallet_name).is_err());
     wallet_client.unload_wallet(None).unwrap();
 
@@ -1315,7 +1347,7 @@ fn test_backupwallet(_: &Client) {
 
     assert!(wallet_client.backup_wallet(None).is_err());
     assert!(wallet_client.backup_wallet(Some(&backup_path)).is_err());
-    wallet_client.create_wallet("testbackupwallet", None, None, None, None).unwrap();
+    wallet_client.create_wallet("testbackupwallet", None, None, None, None, None, None).unwrap();
     assert!(wallet_client.backup_wallet(None).is_err());
     assert!(wallet_client.backup_wallet(Some(&backup_path)).is_ok());
 }
