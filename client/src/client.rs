@@ -1225,6 +1225,18 @@ pub trait RpcApi: Sized {
         self.call("getnettotals", &[])
     }
 
+    /// Returns information about address counts per network in the
+    /// address manager.
+    fn get_addrman_info(&self) -> Result<json::GetAddrmanInfoResult> {
+        self.call("getaddrmaninfo", &[])
+    }
+
+    /// Returns information about address counts per network in the
+    /// address manager.
+    fn get_addrman_info_verbose(&self) -> Result<json::GetAddrmanInfoVerboseResult> {
+        self.call("getaddrmaninfo", &[into_json(true)?])
+    }
+
     /// Returns the estimated network hashes per second based on the last n blocks.
     fn get_network_hash_ps(&self, nblocks: Option<u64>, height: Option<u64>) -> Result<f64> {
         let mut args = [opt_into_json(nblocks)?, opt_into_json(height)?];

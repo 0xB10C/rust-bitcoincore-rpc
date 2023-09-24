@@ -2154,6 +2154,44 @@ impl<'a> serde::Serialize for PubKeyOrAddress<'a> {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetAddrmanInfoResult {
+    pub ipv4: GetAddrmanInfoResultCount,
+    pub ipv6: GetAddrmanInfoResultCount,
+    pub onion: GetAddrmanInfoResultCount,
+    pub i2p: GetAddrmanInfoResultCount,
+    pub cjdns: GetAddrmanInfoResultCount,
+    pub all_networks: GetAddrmanInfoResultCount,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetAddrmanInfoVerboseResult {
+    pub ipv4: GetAddrmanInfoResultCount,
+    pub ipv6: GetAddrmanInfoResultCount,
+    pub onion: GetAddrmanInfoResultCount,
+    pub i2p: GetAddrmanInfoResultCount,
+    pub cjdns: GetAddrmanInfoResultCount,
+    pub all_networks: GetAddrmanInfoResultCount,
+    pub new_table: Vec<GetAddrmanInfoVerboseResultAddress>,
+    pub tried_table: Vec<GetAddrmanInfoVerboseResultAddress>,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetAddrmanInfoResultCount {
+    pub new: u32,
+    pub tried: u32,
+    pub total: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetAddrmanInfoVerboseResultAddress {
+    pub address: String,
+    pub services: u32,
+    pub bucket: u32,
+    pub position: u32,
+    pub source: String,
+}
+
 // Custom deserializer functions.
 
 /// deserialize_hex_array_opt deserializes a vector of hex-encoded byte arrays.
