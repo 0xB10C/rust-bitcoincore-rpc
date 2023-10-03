@@ -2163,6 +2163,25 @@ impl<'a> serde::Serialize for PubKeyOrAddress<'a> {
     }
 }
 
+type GetRawAddrmanResultKey = String;
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetRawAddrmanResult {
+    pub new: HashMap<GetRawAddrmanResultKey, GetRawAddrmanResultAddress>,
+    pub tried: HashMap<GetRawAddrmanResultKey, GetRawAddrmanResultAddress>,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
+pub struct GetRawAddrmanResultAddress {
+    pub address: String,
+    pub port: u16,
+    pub services: u64,
+    pub time: u32,
+    pub network: String,
+    pub source: String,
+    pub source_network: String,
+}
+
 // Custom deserializer functions.
 
 /// deserialize_hex_array_opt deserializes a vector of hex-encoded byte arrays.
