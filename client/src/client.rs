@@ -944,6 +944,38 @@ pub trait RpcApi: Sized {
         self.call("getrawmempool", &[into_json(true)?])
     }
 
+    /// Get in-mempool descendants of the [txid]
+    fn get_mempool_descendants(
+        &self,
+        txid: &bitcoin::Txid,
+    ) -> Result<Vec::<bitcoin::Txid>> {
+        self.call("getmempooldescendants", &[into_json(txid)?])
+    }
+
+    /// Get in-mempool descendants details of the [txid]
+    fn get_mempool_descendants_verbose(
+        &self,
+        txid: &bitcoin::Txid,
+    ) -> Result<HashMap<bitcoin::Txid, json::GetMempoolEntryResult>> {
+        self.call("getmempooldescendants", &[into_json(txid)?, into_json(true)?])
+    }
+
+    /// Get in-mempool ancestors of the [txid]
+    fn get_mempool_anchestors(
+        &self,
+        txid: &bitcoin::Txid,
+    ) -> Result<Vec::<bitcoin::Txid>> {
+        self.call("getmempoolancestors", &[into_json(txid)?])
+    }
+
+    /// Get in-mempool ancestors details of the [txid]
+    fn get_mempool_anchestors_verbose(
+        &self,
+        txid: &bitcoin::Txid,
+    ) -> Result<HashMap<bitcoin::Txid, json::GetMempoolEntryResult>> {
+        self.call("getmempoolancestors", &[into_json(txid)?, into_json(true)?])
+    }
+
     /// Get mempool data for given transaction
     fn get_mempool_entry(&self, txid: &bitcoin::Txid) -> Result<json::GetMempoolEntryResult> {
         self.call("getmempoolentry", &[into_json(txid)?])
