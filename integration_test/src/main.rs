@@ -758,12 +758,12 @@ fn test_test_mempool_accept(cl: &Client) {
 
     let tx =
         cl.create_raw_transaction(&[input.clone()], &output, Some(500_000), Some(false)).unwrap();
-    let res = cl.test_mempool_accept(&[&tx]).unwrap();
+    let res = cl.test_mempool_accept(&[&tx], None).unwrap();
     assert!(!res[0].allowed);
     assert!(res[0].reject_reason.is_some());
     let signed =
         cl.sign_raw_transaction_with_wallet(&tx, None, None).unwrap().transaction().unwrap();
-    let res = cl.test_mempool_accept(&[&signed]).unwrap();
+    let res = cl.test_mempool_accept(&[&signed], None).unwrap();
     assert!(res[0].allowed, "not allowed: {:?}", res[0].reject_reason);
 }
 
