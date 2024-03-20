@@ -511,6 +511,15 @@ pub trait RpcApi: Sized {
         let mut args = [into_json(txid)?, into_json(true)?, opt_into_json(block_hash)?];
         self.call("getrawtransaction", handle_defaults(&mut args, &[null()]))
     }
+    
+    fn get_raw_transaction_info_with_fee(
+        &self,
+        txid: &bitcoin::Txid,
+        block_hash: Option<&bitcoin::BlockHash>,
+    ) -> Result<json::GetRawTransactionResult> {
+        let mut args = [into_json(txid)?, into_json(2)?, opt_into_json(block_hash)?];
+        self.call("getrawtransaction", handle_defaults(&mut args, &[null()]))
+    }
 
     fn get_block_filter(
         &self,

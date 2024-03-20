@@ -611,6 +611,13 @@ pub struct GetRawTransactionResult {
     pub confirmations: Option<u32>,
     pub time: Option<usize>,
     pub blocktime: Option<usize>,
+    // #[serde(
+    //     default,
+    //     skip_serializing_if = "Option::is_none",
+    //     with = "bitcoin::amount::serde::as_btc::opt"
+    // )]
+    #[serde(with = "bitcoin::amount::serde::as_btc::opt")]
+    pub fee: Option<Amount>, 
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
