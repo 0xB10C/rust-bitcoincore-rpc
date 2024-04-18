@@ -842,6 +842,8 @@ pub struct TestMempoolAcceptResult {
     pub allowed: bool,
     #[serde(rename = "reject-reason")]
     pub reject_reason: Option<String>,
+    #[serde(rename = "debug-message")]
+    pub debug_message: Option<String>,
     /// Virtual transaction size as defined in BIP 141 (only present when 'allowed' is true)
     /// Added in Bitcoin Core v0.21
     pub vsize: Option<u64>,
