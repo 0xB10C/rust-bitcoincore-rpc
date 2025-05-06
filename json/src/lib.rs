@@ -618,7 +618,7 @@ pub struct GetRawTransactionResult {
     //     with = "bitcoin::amount::serde::as_btc::opt"
     // )]
     #[serde(with = "bitcoin::amount::serde::as_btc::opt")]
-    pub fee: Option<Amount>, 
+    pub fee: Option<Amount>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
@@ -924,6 +924,7 @@ pub enum ScriptPubkeyType {
     Witness_v0_ScriptHash,
     Witness_v1_Taproot,
     Witness_Unknown,
+    Anchor,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
@@ -2201,7 +2202,7 @@ where
 
 /// deserialize_bip70_network deserializes a Bitcoin Core network according to BIP70
 /// The accepted input variants are: {"main", "test", "signet", "regtest"}
-fn deserialize_bip70_network<'de, D>(deserializer: D) -> Result<Network, D::Error> 
+fn deserialize_bip70_network<'de, D>(deserializer: D) -> Result<Network, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
